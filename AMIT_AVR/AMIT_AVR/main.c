@@ -1,23 +1,22 @@
- #include "MCAL/DIO/H_FILES/AVR_DIO_REG.h"
  #include "LIBRARIES_H/STD_TYPES.h"
  #include "LIBRARIES_H/BIT_MATH.h"
  
+ #include "MCAL/DIO/H_FILES/AVR_DIO_REG.h"
  #include "MCAL/DIO/H_FILES/DIO.h"
 
  #include "HAL/LEDS/H_FILES/LEDS_CONFIG.h"
  #include "HAL/LEDS/H_FILES/LEDS.h"
  
+ #include "HAL/SPI/H_FILES/SPI_REG.h"
  #include "HAL/SPI/H_FILES/SPI_CONFIG.h"
  #include "HAL/SPI/H_FILES/SPI.h"
 
+ #include "HAL/USART/H_FILES/USART_REG.h"
  #include "HAL/USART/H_FILES/USART_CONFIG.h"
  #include "HAL/USART/H_FILES/USART.h"
 
  #include "main.h"
  
- #include <util/delay.h>
-
-
 int main(void){
 	#if (KIT_TYPE == 0)
 		master_Main();
@@ -27,52 +26,67 @@ int main(void){
 	return 0;
 }
 
-int master_Main(){
-	ptr_spi obj = {SPI_MASTER,SPI_MSB,CLK_IDLE_LOW,CLK_SAMPLE_LEADING,SPI_CLK_64};
-	MCAL_SPI_voidInit(&obj);
-	MCAL_USART_voidInit(9600);
+void master_Main(){
+	str_UartConfg_t obj = {9600,UART_8_BIT_MODE,UART_POLLING};
+	MCAL_SPI_MasterInit(SPI_MASTER_FREQUENCY_64);
+	MCAL_UART_init(&obj);
 	HAL_LED_GENERIC_INITIALIZATION(LED_0);
 	HAL_LED_GENERIC_INITIALIZATION(LED_1);
 	uint8_t arr[] = "Please Enter a Button:";
-	MCAL_USART_voidTransmitString(arr);
+	uint8_t i = 0 , chr, recieve;
+	while (arr[i] != '/0'){
+		MCAL_UART_sendByteBusyWait(arr[i++]);
+	}
 	while(1){
-		uint8_t chr = MCAL_USART_u8Receive();
+		MCAL_UART_recieveByteBusyWait(&chr);
 		switch(chr){
-			case '1':
-				HAL_LED_GENERIC_TURN_ON(LED_0);
-				MCAL_SPI_MasterTransData(chr);
+			case '0' :
+				HAL_LED_GENERIC_TURN_ON(LED_0);//to check that the program went through this condition
+				HAL_LED_GENERIC_TURN_OFF(LED_1);
 				break;
-			case '2' :
+			case '1' :
+				HAL_LED_GENERIC_TURN_OFF(LED_0);//to check that the program went through this condition
 				HAL_LED_GENERIC_TURN_ON(LED_1);
-				MCAL_SPI_MasterTransData(chr);
 				break;
 			case '3' :
-				HAL_LED_GENERIC_TURN_OFF(LED_0);
-				MCAL_SPI_MasterTransData(chr);
+				HAL_LED_GENERIC_TURN_ON(LED_0);//to check that the program went through this condition
+				HAL_LED_GENERIC_TURN_ON(LED_1);
 				break;
 			case '4' :
+				HAL_LED_GENERIC_TURN_OFF(LED_0);//to check that the program went through this condition
 				HAL_LED_GENERIC_TURN_OFF(LED_1);
-				MCAL_SPI_MasterTransData(chr);
-				break;
+			break;
+			default :
+				MCAL_SPI_Master_DataBusyWait(chr,&recieve);
+			break;
 		}
 	}
-	return 0;
 }
 
-int slave_Main(){
-	uint8_t recieved_Character , led_State;
+void slave_Main(){
+	MCAL_SPI_SlaveInit();
 	HAL_LED_GENERIC_INITIALIZATION(LED_0);
 	HAL_LED_GENERIC_INITIALIZATION(LED_1);
-	ptr_spi obj = {SPI_SLAVE,SPI_MSB,CLK_IDLE_LOW,CLK_SAMPLE_LEADING};
-	MCAL_SPI_voidInit(&obj);
-	while (1)
-	{
-		recieved_Character = MCAL_SPI_u8SlaveReceive();
-		if (recieved_Character == '1')
-			HAL_LED_GENERIC_TOGGLE(LED_0,&led_State);
-		else if (recieved_Character == '2')
-			HAL_LED_GENERIC_TOGGLE(LED_1,&led_State);
+	uint8_t recieve_char , send = NULL;
+	while(1){
+		MCAL_SPI_Slave_DataBusyWait(send,&recieve_char);
+		switch(recieve_char){
+			case '0' :
+				HAL_LED_GENERIC_TURN_ON(LED_0);//to check that the program went through this condition
+				HAL_LED_GENERIC_TURN_OFF(LED_1);
+				break;
+			case '1' :
+				HAL_LED_GENERIC_TURN_OFF(LED_0);//to check that the program went through this condition
+				HAL_LED_GENERIC_TURN_ON(LED_1);
+				break;
+			case '3' :
+				HAL_LED_GENERIC_TURN_ON(LED_0);//to check that the program went through this condition
+				HAL_LED_GENERIC_TURN_ON(LED_1);
+			break;
+			case '4' :
+				HAL_LED_GENERIC_TURN_OFF(LED_0);//to check that the program went through this condition
+				HAL_LED_GENERIC_TURN_OFF(LED_1);
+			break;
+		}
 	}
-	return  0;
 }
-

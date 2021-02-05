@@ -33,6 +33,7 @@ typedef double double64_t ;                       /*Define Type of 8  Double Byt
 
 #undef F_CPU
 #define F_CPU 8000000UL
+#define SYSTEM_FREQUENCY  8000000UL
 
 
 #endif /* STD_TYPES_H_ */

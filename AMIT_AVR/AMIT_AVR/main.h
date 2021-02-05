@@ -13,7 +13,7 @@
 #define KIT_TYPE 1  //MASTER
 //#define KIT_TYPE 1   //SLAVE
 
-int master_Main();
-int slave_Main();
+void master_Main();
+void slave_Main();
 
 #endif /* INCFILE1_H_ */

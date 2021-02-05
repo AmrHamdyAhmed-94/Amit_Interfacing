@@ -8,44 +8,102 @@
  #ifndef SPI_H_
  #define SPI_H_
 
- /******SPI type******/
- #define SPI_MASTER 1
- #define SPI_SLAVE 0
-
- /******MSB or LSB*******/
- #define SPI_MSB 0
- #define SPI_LSB 1
-
- /*******CLK Polarity******/
- #define CLK_IDLE_LOW 0
- #define CLK_IDLE_HIGH 1
-
- /*******CLK Phase*********/
- #define CLK_SAMPLE_LEADING 0
- #define CLK_SAMPLE_TRAILING 1
-
- /*******SPI Clock*******/
- #define SPI_CLK_4 0
- #define SPI_CLK_16 1
- #define SPI_CLK_64 2
- #define SPI_CLK_128 3
- #define SPI_CLK_Double_2 4
- #define SPI_CLK_Double_8 5
- #define SPI_CLK_Double_32 6
- #define SPI_CLK_Double_64 7
-
- typedef struct
- {
-	 uint8_t spi_type;
-	 uint8_t spi_data_direction;
-	 uint8_t clk_polarity;
-	 uint8_t clk_phase;
-	 uint8_t spi_clk;
- }ptr_spi;
- void MCAL_SPI_voidInit(ptr_spi *ptr_info);
- void MCAL_SPI_MasterTransData(uint8_t u8Data);
- uint8_t MCAL_SPI_u8SlaveReceive();
+#define SPI_SS_PIN   	DIO_PORTB , DIO_PIN_4
+#define SPI_MOSI_PIN   	DIO_PORTB , DIO_PIN_5
+#define SPI_MISO_PIN   	DIO_PORTB , DIO_PIN_6
+#define SPI_SCK_PIN   	DIO_PORTB , DIO_PIN_7
 
 
+#define MSB_FIRST            0U
+#define LSB_FIRST            1U
+
+#define CLOCK_IDLE_HIGH      1U
+#define CLOCK_IDLE_LOW       0U
+
+#define SAMPLE_IN_LEADING    0U
+#define SETUP_IN_LEADING     1U
+
+
+#define SPI_MASTER_FREQUENCY_4      0U
+#define SPI_MASTER_FREQUENCY_16     1U
+#define SPI_MASTER_FREQUENCY_64     2U
+#define SPI_MASTER_FREQUENCY_128    3U
+#define SPI_MASTER_DOUBLE_FREQUENCY_2      4U
+#define SPI_MASTER_DOUBLE_FREQUENCY_8      5U
+#define SPI_MASTER_DOUBLE_FREQUENCY_32     6U
+#define SPI_MASTER_DOUBLE_FREQUENCY_64     7U
+#define SPI_SLAVE_FREQUENCY			8U
+
+#define SPI_SLAVE			 0U
+#define SPI_MASTER			 1U
+
+#define SPI_POLLING          0U
+#define SPI_INTERRUPT        1U
+
+typedef struct
+{
+	uint8_t MasterMode ;
+	uint8_t ClockFrequency ;
+	uint8_t FlagMode ;
+
+}St_SPICfg_t;
+
+
+/*- FUNCTION DECLARATIONS ----------------------------------*/
+/*************************************************************
+*Description: Initialization of SPI Module
+* Input     : Clock frequency
+* Output    : Error Status
+* */
+extern uint8_t MCAL_SPI_MasterInit(uint8_t ClockFrequency);
+
+/*Description: Initialization of SPI Module Slave
+* Input     : void
+* Output    : Error Status
+* */
+extern uint8_t MCAL_SPI_SlaveInit(void);
+
+
+/*************************************************************
+*Description: Send and Receive Data of SPI Module Master
+* Input     : Copy_u8DataSend Data to send , pointer to Data  received
+* Output    : void
+* */
+extern void MCAL_SPI_Master_DataBusyWait(uint8_t Copy_u8DataSend , uint8_t *Ptr_DataReceive);
+
+/*************************************************************
+*Description: Send and Receive Data of SPI Module Slave
+* Input     : Copy_u8DataSend Data to send , pointer to Data  received
+* Output    : void
+* */
+extern void MCAL_SPI_Slave_DataBusyWait(uint8_t Copy_u8DataSend , uint8_t *Ptr_DataReceive);
+
+/*************************************************************
+*Description: MCAL_SPI_Master_DataCallBack
+* Input     : Copy_u8DataSend Data to send , pointer to function takes Data  received
+* Output    : void
+* */
+extern void MCAL_SPI_Master_DataCallBack(uint8_t Copy_u8DataSend , void (*Ptr_DataReceive)(uint8_t));
+
+/*************************************************************
+*Description: MCAL_SPI_Slave_DataCallBack
+* Input     : Copy_u8DataSend Data to send , pointer to function takes Data  received
+* Output    : void
+* */
+extern void MCAL_SPI_Slave_DataCallBack(uint8_t Copy_u8DataSend , void (*Ptr_DataReceive)(uint8_t));
+
+/*************************************************************
+*Description: MCAL_SPI_MasterString
+* Input     : Copy_u8DataSend Data to send , pointer to function takes Data  received
+* Output    : void
+* */
+extern void MCAL_SPI_MasterString(uint8_t *Copy_u8DataSend , void (*Ptr_DataReceive)(uint8_t));
+
+/*************************************************************
+*Description: MCAL_SPI_SlaveString
+* Input     : Copy_u8DataSend Data to send , pointer to function takes Data  received
+* Output    : void
+* */
+extern void MCAL_SPI_SlaveString(uint8_t *Copy_u8DataSend , void (*Ptr_DataReceive)(uint8_t));
 
  #endif /* SPI_H_ */

@@ -168,6 +168,9 @@
     <Compile Include="HAL\SPI\C_FILES\SPI.c">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="HAL\SPI\H_FILES\SPI_REG.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="HAL\SPI\H_FILES\SPI_CONFIG.h">
       <SubType>compile</SubType>
     </Compile>
@@ -190,6 +193,9 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="HAL\USART\H_FILES\USART.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="HAL\USART\H_FILES\USART_REG.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="HashedCode.c">
